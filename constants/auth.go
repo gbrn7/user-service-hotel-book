@@ -1,5 +1,6 @@
 package constants
 
 const (
-	Token = "Token"
+	UserLogin = "user_login"
+	Token     = "Token"
 )

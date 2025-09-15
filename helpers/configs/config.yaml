@@ -1,0 +1,20 @@
+service: 
+  port: "7001"
+  signatureKey: "hFxakYwnKuep6kAB3FKe32dWATfJn95A"
+  rateLimiterMaxRequest: 1000
+  rateLimiterTimeSecond: 60
+
+database: 
+  host: "localhost"
+  port: 5433
+  name: "hotel_user_service"
+  username: "root"
+  password: "barca1899"
+  maxOpenConnection: 10,
+  maxLifetimeConnection: 10,
+  maxIdleConnection: 10,
+  maxIdleTime: 10
+
+grpc:
+  host:
+
