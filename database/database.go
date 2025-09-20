@@ -6,18 +6,21 @@ import (
 	"time"
 	"user-service/helpers/configs"
 
+	"github.com/sirupsen/logrus"
 	"gorm.io/driver/postgres"
 	"gorm.io/gorm"
 )
 
 func InitDatabase(config configs.Config) (*gorm.DB, error) {
 	encodePassword := url.QueryEscape(config.Database.Password)
-	uri := fmt.Sprintf("postgreesql://%s:%s@%s:%d/%s?sslmodel=disable",
+	uri := fmt.Sprintf("postgresql://%s:%s@%s:%d/%s?sslmode=disable",
 		config.Database.Username,
 		encodePassword,
 		config.Database.Host,
 		config.Database.Port,
 		config.Database.Name)
+
+	logrus.Infof("uri: %s", uri)
 
 	db, err := gorm.Open(postgres.Open(uri))
 	if err != nil {

@@ -16,9 +16,9 @@ type ClaimToken struct {
 	jwt.RegisteredClaims
 }
 
-func GenerateToken(ctx context.Context, user dto.UserResponse, expirationTime int64) (string, error) {
+func GenerateToken(ctx context.Context, user *dto.UserResponse, expirationTime int64) (string, error) {
 	claimToken := &ClaimToken{
-		User: &user,
+		User: user,
 		RegisteredClaims: jwt.RegisteredClaims{
 			ExpiresAt: jwt.NewNumericDate(time.Unix(expirationTime, 0)),
 		},

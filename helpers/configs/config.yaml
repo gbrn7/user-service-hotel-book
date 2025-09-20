@@ -10,9 +10,9 @@ database:
   name: "hotel_user_service"
   username: "root"
   password: "barca1899"
-  maxOpenConnection: 10,
-  maxLifetimeConnection: 10,
-  maxIdleConnection: 10,
+  maxOpenConnection: 10
+  maxLifetimeConnection: 10
+  maxIdleConnection: 10
   maxIdleTime: 10
 
 grpc:

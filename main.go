@@ -1,5 +1,7 @@
 package main
 
-func main() {
+import "user-service/cmd"
 
+func main() {
+	cmd.Run()
 }

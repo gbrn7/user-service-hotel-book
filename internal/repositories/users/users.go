@@ -3,6 +3,7 @@ package users
 import (
 	"context"
 	"errors"
+	"user-service/constants"
 	errConstants "user-service/constants/error"
 	"user-service/domain/dto"
 	"user-service/domain/models"
@@ -111,4 +112,61 @@ func (r *repository) FindByUsername(ctx context.Context, username string) (*mode
 	}
 
 	return &user, nil
+}
+
+func (r *repository) GetAllUser(ctx context.Context) (*[]models.User, error) {
+	var users []models.User
+
+	err := r.db.WithContext(ctx).
+		Preload("Role").
+		Find(&users).
+		Error
+
+	if err != nil {
+		if errors.Is(err, gorm.ErrRecordNotFound) {
+			return nil, helpers.WrapError(errConstants.ErrUserNotFound)
+		}
+
+		return nil, helpers.WrapError(errConstants.ErrSQLError)
+	}
+
+	return &users, nil
+}
+
+func (r *repository) GetAllAdmin(ctx context.Context) (*[]models.User, error) {
+	var users []models.User
+
+	err := r.db.WithContext(ctx).
+		Preload("Role", "id = ?", constants.Admin).
+		Find(&users).
+		Error
+
+	if err != nil {
+		if errors.Is(err, gorm.ErrRecordNotFound) {
+			return nil, helpers.WrapError(errConstants.ErrUserNotFound)
+		}
+
+		return nil, helpers.WrapError(errConstants.ErrSQLError)
+	}
+
+	return &users, nil
+}
+
+func (r *repository) GetAllCustomer(ctx context.Context) (*[]models.User, error) {
+	var users []models.User
+
+	err := r.db.WithContext(ctx).
+		Preload("Role", "id = ?", constants.Customer).
+		Find(&users).
+		Error
+
+	if err != nil {
+		if errors.Is(err, gorm.ErrRecordNotFound) {
+			return nil, helpers.WrapError(errConstants.ErrUserNotFound)
+		}
+
+		return nil, helpers.WrapError(errConstants.ErrSQLError)
+	}
+
+	return &users, nil
 }

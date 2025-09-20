@@ -17,5 +17,5 @@ type User struct {
 	PhoneNumber string    `gorm:"type:varchar(100);not null"`
 	CreatedAt   time.Time
 	UpdatedAt   time.Time
-	Role        Role `gorm:"foreignKey:role_id;references:id;constraint:OnUpdate:CASCASE,OnDelete:CASCADE"`
+	Role        Role `gorm:"foreignKey:role_id;references:id;constraint:OnUpdate:CASCADE,OnDelete:CASCADE"`
 }
