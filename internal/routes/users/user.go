@@ -36,8 +36,9 @@ func NewUserRoute(controller UserController, group *gin.RouterGroup) IUserRoute 
 func (u *UserRoute) Run() {
 	group := u.group.Group("/auth")
 	group.GET("/user", middlewares.Authenticate(), u.controller.GetUserLogin)
+	group.GET("/cust", middlewares.Authenticate(), u.controller.GetAllCustomer)
 	group.GET("/:uuid", middlewares.Authenticate(), u.controller.GetUserByUUID)
-	group.POST("/login", u.controller.SignIn)
-	group.POST("/register", u.controller.SignUp)
+	group.POST("/signin", u.controller.SignIn)
+	group.POST("/signup", u.controller.SignUp)
 	group.PUT("/:uuid", middlewares.Authenticate(), u.controller.Update)
 }

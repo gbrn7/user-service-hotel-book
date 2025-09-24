@@ -6,7 +6,6 @@ import (
 	"time"
 	"user-service/helpers/configs"
 
-	"github.com/sirupsen/logrus"
 	"gorm.io/driver/postgres"
 	"gorm.io/gorm"
 )
@@ -19,8 +18,6 @@ func InitDatabase(config configs.Config) (*gorm.DB, error) {
 		config.Database.Host,
 		config.Database.Port,
 		config.Database.Name)
-
-	logrus.Infof("uri: %s", uri)
 
 	db, err := gorm.Open(postgres.Open(uri))
 	if err != nil {

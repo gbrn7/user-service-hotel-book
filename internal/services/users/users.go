@@ -3,6 +3,7 @@ package users
 import (
 	"context"
 	"strings"
+	"time"
 	"user-service/constants"
 	errConstants "user-service/constants/error"
 	"user-service/domain/dto"
@@ -26,7 +27,7 @@ func (s *service) Register(ctx context.Context, req *dto.RegisterRequest) (*dto.
 		return nil, errConstants.ErrUsernameExist
 	}
 
-	user, err = s.repository.FindByEmail(ctx, req.Username)
+	user, err = s.repository.FindByEmail(ctx, req.Email)
 	if err != nil {
 		return nil, err
 	}
@@ -85,7 +86,9 @@ func (s *service) Login(ctx context.Context, req *dto.LoginRequest) (*dto.LoginR
 		PhoneNumber: user.PhoneNumber,
 	}
 
-	token, err := helpers.GenerateToken(ctx, data, int64(s.cfg.JwtConfig.JwtExpirationTime))
+	expirationTime := time.Now().Add(time.Duration(s.cfg.JwtConfig.JwtExpirationTime) * time.Minute).Unix()
+
+	token, err := helpers.GenerateToken(ctx, data, expirationTime)
 	if err != nil {
 		return nil, err
 	}
@@ -101,10 +104,10 @@ func (s *service) Login(ctx context.Context, req *dto.LoginRequest) (*dto.LoginR
 func (s *service) GetUserLogin(ctx context.Context) (*dto.UserResponse, error) {
 	var (
 		userLogin = ctx.Value(constants.UserLogin).(*dto.UserResponse)
-		data      *dto.UserResponse
+		data      dto.UserResponse
 	)
 
-	data = &dto.UserResponse{
+	data = dto.UserResponse{
 		UUID:        userLogin.UUID,
 		Name:        userLogin.Name,
 		Username:    userLogin.Username,
@@ -113,7 +116,7 @@ func (s *service) GetUserLogin(ctx context.Context) (*dto.UserResponse, error) {
 		PhoneNumber: userLogin.PhoneNumber,
 	}
 
-	return data, nil
+	return &data, nil
 }
 
 func (s *service) GetUserByUUID(ctx context.Context, uuid string) (*dto.UserResponse, error) {

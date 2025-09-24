@@ -85,7 +85,7 @@ func (r *repository) FindByEmail(ctx context.Context, email string) (*models.Use
 
 	if err != nil {
 		if errors.Is(err, gorm.ErrRecordNotFound) {
-			return nil, helpers.WrapError(errConstants.ErrUserNotFound)
+			return nil, nil
 		}
 
 		return nil, helpers.WrapError(errConstants.ErrSQLError)
@@ -105,9 +105,8 @@ func (r *repository) FindByUsername(ctx context.Context, username string) (*mode
 
 	if err != nil {
 		if errors.Is(err, gorm.ErrRecordNotFound) {
-			return nil, helpers.WrapError(errConstants.ErrUserNotFound)
+			return nil, nil
 		}
-
 		return nil, helpers.WrapError(errConstants.ErrSQLError)
 	}
 

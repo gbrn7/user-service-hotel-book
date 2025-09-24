@@ -1,4 +1,6 @@
 service: 
+  appName: "user-service"
+  appEnv: "local"
   port: "7001"
   signatureKey: "hFxakYwnKuep6kAB3FKe32dWATfJn95A"
   rateLimiterMaxRequest: 1000
@@ -17,4 +19,9 @@ database:
 
 grpc:
   host:
+
+jwtConfig:
+  jwtSecretKey: "Zr8DfW5bXyNqA3VoLmTpKeY1Cu97JgHs"
+  jwtExpirationTime: 1440
+  
 

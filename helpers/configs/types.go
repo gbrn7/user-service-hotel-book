@@ -9,6 +9,8 @@ type (
 	}
 
 	Service struct {
+		AppName               string  `json:"appName"`
+		AppEnv                string  `json:"appEnv"`
 		Port                  int     `json:"port"`
 		SignatureKey          string  `json:"signatureKey"`
 		RateLimiterMaxRequest float64 `json:"rateLimiterMaxRequest"`

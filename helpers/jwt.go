@@ -37,7 +37,7 @@ func GenerateToken(ctx context.Context, user *dto.UserResponse, expirationTime i
 }
 
 func extractBearerToken(token string) string {
-	arrayToken := strings.Split(token, "")
+	arrayToken := strings.Split(token, " ")
 	if len(arrayToken) == 2 {
 		return arrayToken[1]
 	}
@@ -64,6 +64,7 @@ func ValidateBearerToken(ctx context.Context, token string) (*ClaimToken, error)
 		}
 
 		jwtSecret := []byte(cfg.JwtConfig.JwtSecretKey)
+
 		return jwtSecret, nil
 	})
 

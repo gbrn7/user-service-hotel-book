@@ -103,7 +103,7 @@ func (u *UserController) SignIn(ctx *gin.Context) {
 }
 
 func (u *UserController) GetUserLogin(ctx *gin.Context) {
-	user, err := u.service.GetUserLogin(ctx)
+	user, err := u.service.GetUserLogin(ctx.Request.Context())
 	if err != nil {
 		helpers.HttpResponse(helpers.ParamHTTPResp{
 			Code: http.StatusBadRequest,
@@ -119,7 +119,6 @@ func (u *UserController) GetUserLogin(ctx *gin.Context) {
 		Data: user,
 		Gin:  ctx,
 	})
-
 }
 
 func (u *UserController) GetUserByUUID(ctx *gin.Context) {

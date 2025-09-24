@@ -54,7 +54,7 @@ func Authenticate() gin.HandlerFunc {
 			return
 		}
 
-		claimToken, err := helpers.ValidateBearerToken(c.Request.Context(), token)
+		claimToken, err := helpers.ValidateBearerToken(c, token)
 		if err != nil {
 			helpers.ResponseUnauthorized(c, err.Error())
 			return
@@ -68,6 +68,7 @@ func Authenticate() gin.HandlerFunc {
 
 		userLogin := c.Request.WithContext(context.WithValue(c.Request.Context(), constants.UserLogin, claimToken.User))
 		c.Request = userLogin
+
 		c.Set(constants.Token, token)
 
 		c.Next()
