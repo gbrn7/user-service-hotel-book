@@ -37,4 +37,8 @@ type (
 	GrpcConfig struct {
 		Host string `json:"host"`
 	}
+
+	ElasticConfig struct {
+		ApMServerUrl string `json:"apmServerUrl"`
+	}
 )

@@ -24,4 +24,6 @@ jwtConfig:
   jwtSecretKey: "Zr8DfW5bXyNqA3VoLmTpKeY1Cu97JgHs"
   jwtExpirationTime: 1440
   
+elastic:
+  apmServerUrl: "http://localhost:8200"
 

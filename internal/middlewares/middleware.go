@@ -34,6 +34,7 @@ func RateLimiter(lmt *limiter.Limiter) gin.HandlerFunc {
 	return func(c *gin.Context) {
 		err := tollbooth.LimitByRequest(lmt, c.Writer, c.Request)
 		if err != nil {
+			logrus.Errorf("rate limit exceeded: %v", err)
 			c.JSON(http.StatusTooManyRequests, helpers.Response{
 				Status:  constants.Error,
 				Message: errConstants.ErrTooManyRequests.Error(),
@@ -50,18 +51,21 @@ func Authenticate() gin.HandlerFunc {
 		token := c.GetHeader(constants.Authorization)
 
 		if token == "" {
+			logrus.Errorf("missing authorization token")
 			helpers.ResponseUnauthorized(c, errConstants.ErrUnautorized.Error())
 			return
 		}
 
 		claimToken, err := helpers.ValidateBearerToken(c, token)
 		if err != nil {
+			logrus.Errorf("invalid token: %v", err)
 			helpers.ResponseUnauthorized(c, err.Error())
 			return
 		}
 
 		err = helpers.ValidateAPIKey(c)
 		if err != nil {
+			logrus.Errorf("invalid API key: %v", err)
 			helpers.ResponseUnauthorized(c, err.Error())
 			return
 		}

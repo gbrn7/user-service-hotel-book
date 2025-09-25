@@ -9,16 +9,20 @@ import (
 	"user-service/domain/dto"
 	"user-service/helpers"
 
+	"go.elastic.co/apm/v2"
 	"golang.org/x/crypto/bcrypt"
 )
 
 func (s *service) Register(ctx context.Context, req *dto.RegisterRequest) (*dto.RegisterResponse, error) {
+	span, spanctx := apm.StartSpan(ctx, "UserService.Register", "service")
+	defer span.End()
+
 	hashPassword, err := bcrypt.GenerateFromPassword([]byte(req.Password), bcrypt.DefaultCost)
 	if err != nil {
 		return nil, err
 	}
 
-	user, err := s.repository.FindByUsername(ctx, req.Username)
+	user, err := s.repository.FindByUsername(spanctx, req.Username)
 	if err != nil {
 		return nil, err
 	}
@@ -27,7 +31,7 @@ func (s *service) Register(ctx context.Context, req *dto.RegisterRequest) (*dto.
 		return nil, errConstants.ErrUsernameExist
 	}
 
-	user, err = s.repository.FindByEmail(ctx, req.Email)
+	user, err = s.repository.FindByEmail(spanctx, req.Email)
 	if err != nil {
 		return nil, err
 	}
@@ -40,7 +44,7 @@ func (s *service) Register(ctx context.Context, req *dto.RegisterRequest) (*dto.
 		return nil, errConstants.ErrPasswordDoesNotMatch
 	}
 
-	user, err = s.repository.Create(ctx, &dto.RegisterRequest{
+	user, err = s.repository.Create(spanctx, &dto.RegisterRequest{
 		Name:        req.Name,
 		Username:    req.Username,
 		Password:    string(hashPassword),
@@ -67,7 +71,10 @@ func (s *service) Register(ctx context.Context, req *dto.RegisterRequest) (*dto.
 }
 
 func (s *service) Login(ctx context.Context, req *dto.LoginRequest) (*dto.LoginResponse, error) {
-	user, err := s.repository.FindByEmail(ctx, req.Email)
+	span, spanctx := apm.StartSpan(ctx, "UserService.Login", "service")
+	defer span.End()
+
+	user, err := s.repository.FindByEmail(spanctx, req.Email)
 	if err != nil {
 		return nil, err
 	}
@@ -102,6 +109,9 @@ func (s *service) Login(ctx context.Context, req *dto.LoginRequest) (*dto.LoginR
 }
 
 func (s *service) GetUserLogin(ctx context.Context) (*dto.UserResponse, error) {
+	span, _ := apm.StartSpan(ctx, "UserService.GetUserLogin", "service")
+	defer span.End()
+
 	var (
 		userLogin = ctx.Value(constants.UserLogin).(*dto.UserResponse)
 		data      dto.UserResponse
@@ -120,7 +130,10 @@ func (s *service) GetUserLogin(ctx context.Context) (*dto.UserResponse, error) {
 }
 
 func (s *service) GetUserByUUID(ctx context.Context, uuid string) (*dto.UserResponse, error) {
-	user, err := s.repository.FindByUUID(ctx, uuid)
+	span, spanCtx := apm.StartSpan(ctx, "UserService.GetUserByUUID", "service")
+	defer span.End()
+
+	user, err := s.repository.FindByUUID(spanCtx, uuid)
 	if err != nil {
 		return nil, helpers.WrapError(err)
 	}
@@ -137,7 +150,10 @@ func (s *service) GetUserByUUID(ctx context.Context, uuid string) (*dto.UserResp
 }
 
 func (s *service) GetAllAdmin(ctx context.Context) ([]*dto.UserResponse, error) {
-	users, err := s.repository.GetAllAdmin(ctx)
+	span, spanCtx := apm.StartSpan(ctx, "UserService.GetAllAdmin", "service")
+	defer span.End()
+
+	users, err := s.repository.GetAllAdmin(spanCtx)
 	if err != nil {
 		return nil, err
 	}
@@ -157,7 +173,10 @@ func (s *service) GetAllAdmin(ctx context.Context) ([]*dto.UserResponse, error) 
 }
 
 func (s *service) GetAllCustomer(ctx context.Context) ([]*dto.UserResponse, error) {
-	users, err := s.repository.GetAllCustomer(ctx)
+	span, spanCtx := apm.StartSpan(ctx, "UserService.GetAllCustomer", "service")
+	defer span.End()
+
+	users, err := s.repository.GetAllCustomer(spanCtx)
 	if err != nil {
 		return nil, err
 	}
@@ -177,7 +196,10 @@ func (s *service) GetAllCustomer(ctx context.Context) ([]*dto.UserResponse, erro
 }
 
 func (s *service) GetAllUser(ctx context.Context) ([]*dto.UserResponse, error) {
-	users, err := s.repository.GetAllUser(ctx)
+	span, spanCtx := apm.StartSpan(ctx, "UserService.GetAllUser", "service")
+	defer span.End()
+
+	users, err := s.repository.GetAllUser(spanCtx)
 	if err != nil {
 		return nil, err
 	}
@@ -198,6 +220,8 @@ func (s *service) GetAllUser(ctx context.Context) ([]*dto.UserResponse, error) {
 }
 
 func (s *service) Update(ctx context.Context, req *dto.UpdateRequest, uuid string) (*dto.UserResponse, error) {
+	span, spanCtx := apm.StartSpan(ctx, "UserService.Update", "service")
+	defer span.End()
 
 	var password string
 	user, err := s.GetUserByUUID(ctx, uuid)
@@ -205,7 +229,7 @@ func (s *service) Update(ctx context.Context, req *dto.UpdateRequest, uuid strin
 		return nil, err
 	}
 
-	userByUsername, err := s.repository.FindByUsername(ctx, req.Username)
+	userByUsername, err := s.repository.FindByUsername(spanCtx, req.Username)
 	if err != nil {
 		return nil, err
 	}
@@ -214,7 +238,7 @@ func (s *service) Update(ctx context.Context, req *dto.UpdateRequest, uuid strin
 		return nil, errConstants.ErrUsernameExist
 	}
 
-	userByEmail, err := s.repository.FindByEmail(ctx, req.Email)
+	userByEmail, err := s.repository.FindByEmail(spanCtx, req.Email)
 	if err != nil {
 		return nil, err
 	}
@@ -236,7 +260,7 @@ func (s *service) Update(ctx context.Context, req *dto.UpdateRequest, uuid strin
 		password = string(hashPassword)
 	}
 
-	userResult, err := s.repository.Update(ctx, &dto.UpdateRequest{
+	userResult, err := s.repository.Update(spanCtx, &dto.UpdateRequest{
 		Name:        req.Name,
 		Username:    req.Username,
 		Password:    &password,

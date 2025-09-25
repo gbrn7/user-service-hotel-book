@@ -2,7 +2,9 @@ package cmd
 
 import (
 	"fmt"
+	"io"
 	"net/http"
+	"os"
 	"time"
 	"user-service/constants"
 	"user-service/database"
@@ -22,6 +24,7 @@ import (
 	"github.com/joho/godotenv"
 	"github.com/sirupsen/logrus"
 	"github.com/spf13/cobra"
+	"go.elastic.co/apm/module/apmgin/v2"
 )
 
 var command = &cobra.Command{
@@ -29,6 +32,9 @@ var command = &cobra.Command{
 	Short: "Start the serve",
 	Run: func(cmd *cobra.Command, args []string) {
 		_ = godotenv.Load()
+
+		//setup logfile
+		SetupLogfile()
 
 		err := configs.Init(
 			configs.WithConfigFolder(
@@ -52,6 +58,7 @@ var command = &cobra.Command{
 
 		db, err := database.InitDatabase(*cfg)
 		if err != nil {
+			logrus.Errorf("failed to connect to database: %v", err)
 			panic(err)
 		}
 
@@ -61,6 +68,7 @@ var command = &cobra.Command{
 		)
 
 		if err != nil {
+			logrus.Errorf("failed to migrate database: %v", err)
 			panic(err)
 		}
 
@@ -103,6 +111,8 @@ var command = &cobra.Command{
 			DefaultExpirationTTL: time.Duration(cfg.Service.RateLimiterMaxSecond) * time.Second,
 		})
 
+		router.Use(apmgin.Middleware(router))
+
 		router.Use(middlewares.RateLimiter(lmt))
 
 		group := router.Group("/api/v1")
@@ -119,4 +129,28 @@ func Run() {
 	if err != nil {
 		panic(err)
 	}
+}
+
+// CustomFormatter bikin format mirip log bawaan Go
+type CustomFormatter struct{}
+
+func (f *CustomFormatter) Format(entry *logrus.Entry) ([]byte, error) {
+	// Format waktu: 2025/09/24 09:50:03
+	timestamp := entry.Time.Format("2006/01/02 15:04:05")
+	// Format log: 2025/09/24 09:50:03 message
+	logLine := []byte(timestamp + " " + entry.Message + "\n")
+	return logLine, nil
+}
+
+func SetupLogfile() {
+	logfile, err := os.OpenFile("./logs/user-service.log", os.O_CREATE|os.O_RDWR|os.O_APPEND, 0666)
+	if err != nil {
+		logrus.Fatal(err)
+	}
+
+	mw := io.MultiWriter(os.Stdout, logfile)
+	logrus.SetOutput(mw)
+
+	// Pakai formatter custom
+	logrus.SetFormatter(&CustomFormatter{})
 }
