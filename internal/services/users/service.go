@@ -7,6 +7,7 @@ import (
 	"user-service/helpers/configs"
 )
 
+//go:generate mockgen -source=service.go -destination=./users_repository_mock_test.go -package=users
 type repository interface {
 	Create(context.Context, *dto.RegisterRequest) (*models.User, error)
 	Update(context.Context, *dto.UpdateRequest, string) (*models.User, error)
