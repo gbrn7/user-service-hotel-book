@@ -7,6 +7,7 @@ import (
 	"github.com/gin-gonic/gin"
 )
 
+//go:generate mockgen -source=controller.go -destination=./users_service_mock_test.go -package=users
 type service interface {
 	Register(context.Context, *dto.RegisterRequest) (*dto.RegisterResponse, error)
 	Login(context.Context, *dto.LoginRequest) (*dto.LoginResponse, error)

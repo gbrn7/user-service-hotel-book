@@ -49,7 +49,7 @@ func (u *UserController) SignUp(ctx *gin.Context) {
 	if err != nil {
 		logrus.Errorf("error registering user: %s", err)
 		helpers.HttpResponse(helpers.ParamHTTPResp{
-			Code: http.StatusBadRequest,
+			Code: http.StatusInternalServerError,
 			Err:  err,
 			Gin:  ctx,
 		})
@@ -57,7 +57,7 @@ func (u *UserController) SignUp(ctx *gin.Context) {
 	}
 
 	helpers.HttpResponse(helpers.ParamHTTPResp{
-		Code: http.StatusOK,
+		Code: http.StatusCreated,
 		Data: user.User,
 		Gin:  ctx,
 	})
@@ -282,7 +282,7 @@ func (u *UserController) Update(ctx *gin.Context) {
 	}
 
 	helpers.HttpResponse(helpers.ParamHTTPResp{
-		Code: http.StatusCreated,
+		Code: http.StatusOK,
 		Data: user,
 		Gin:  ctx,
 	})
